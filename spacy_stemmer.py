@@ -15,18 +15,10 @@ SPACY_LANG_TO_NLTK_STEMMER_LANG["en"] = "porter"
 
 
 class Stemmer:
-    def __init__(
-        self,
-        *,
-        nlp: Language,
-        lowercase: bool,
-        attr_name: str,
-        attr_name_ws_suffix: str
-    ) -> None:
+    def __init__(self, *, nlp: Language, lowercase: bool, attr_name: str) -> None:
         self.nlp = nlp
         self.lowercase = lowercase
         self.attr_name = attr_name
-        self.attr_name_ws = attr_name + attr_name_ws_suffix
 
         # Set language
         if self.nlp.lang in SPACY_LANG_TO_NLTK_STEMMER_LANG:
@@ -39,36 +31,13 @@ class Stemmer:
         # Set extensions
         if not Token.has_extension(self.attr_name):
             Token.set_extension(self.attr_name, default="")
-        if not Token.has_extension(self.attr_name_ws):
-            Token.set_extension(
-                self.attr_name_ws,
-                getter=lambda token: token._.get(self.attr_name) + token.whitespace_,
-            )
 
         if not Span.has_extension(self.attr_name):
             Span.set_extension(
                 self.attr_name,
-                getter=lambda span: " ".join(
-                    token._.get(self.attr_name) for token in span if not token.is_space
-                ),
-            )
-        if not Span.has_extension(self.attr_name_ws):
-            Span.set_extension(
-                self.attr_name_ws,
                 getter=lambda span: "".join(
-                    token._.get(self.attr_name_ws) for token in span
-                ),
-            )
-
-        if not Doc.has_extension(self.attr_name):
-            Doc.set_extension(
-                self.attr_name,
-                getter=lambda doc: doc[:]._.get(self.attr_name),
-            )
-        if not Doc.has_extension(self.attr_name_ws):
-            Doc.set_extension(
-                self.attr_name_ws,
-                getter=lambda doc: doc[:]._.get(self.attr_name_ws),
+                    token._.get(self.attr_name) + token.whitespace_ for token in span
+                ).strip(),
             )
 
     def __call__(self, doc: Doc) -> Doc:
@@ -80,25 +49,8 @@ class Stemmer:
         return doc
 
 
-@Language.factory(
-    "stemmer",
-    default_config={
-        "lowercase": True,
-        "attr_name": "stem",
-        "attr_name_ws_suffix": "_with_ws",
-    },
-)
+@Language.factory("stemmer", default_config={"lowercase": True, "attr_name": "stem"})
 def make_stemmer(
-    nlp: Language,
-    name: str,
-    *,
-    lowercase: bool,
-    attr_name: str,
-    attr_name_ws_suffix: str
+    nlp: Language, name: str, *, lowercase: bool, attr_name: str
 ) -> Stemmer:
-    return Stemmer(
-        nlp=nlp,
-        lowercase=lowercase,
-        attr_name=attr_name,
-        attr_name_ws_suffix=attr_name_ws_suffix,
-    )
+    return Stemmer(nlp=nlp, lowercase=lowercase, attr_name=attr_name)
