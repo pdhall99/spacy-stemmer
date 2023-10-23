@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spacy-stemmer"
+version="0.0.1"
+description = "spaCy stemmer component"
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    {name = "PD Hall", email = "20580126+pdhall99@users.noreply.github.com"},
+]
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "langcodes[data]",
+    "nltk",
+    "spacy>=3.0.0"
+]
+
+[project.entry-points.spacy_factories]
+stemmer = "spacy_stemmer:Stemmer"
+
+[project.urls]
+Homepage = "https://github.com/pdhall99/spacy-stemmer"
+
+[tool.isort]
+profile = "black"
